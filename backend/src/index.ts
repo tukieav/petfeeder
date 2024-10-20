@@ -2,12 +2,15 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes';
+import animalRoutes from './routes/animalRoutes';
 import Message from './models/Message';
+
 const app : any = express();
 app.use(bodyParser.json());
-// Użycie tras
+
 app.use('/auth', authRoutes);
-// Połączenie z bazą danych MongoDB
+app.use('/animals', animalRoutes);
+
 mongoose.connect('mongodb://localhost:27017/pet-health-book')
   .then(async () => {
     const existingMessage : any = await Message.findOne();
@@ -20,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/pet-health-book')
     });
   })
   .catch(err => console.error(err));
-// Przykładowa trasa
+
 app.get('/', async (req : any, res : any) => {
   try {
     const message : any = await Message.findOne();
