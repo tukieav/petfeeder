@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack'; // Import typów nawigacji
 import AnimalList from './AnimalList';
+
+// Definiowanie typów dla stosu nawigacji
+type RootStackParamList = {
+  Auth: undefined;
+  AnimalList: undefined;
+};
+
+type AuthScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Auth'>;
 
 export default function Auth() {
   const [username, setUsername] = useState('');
@@ -10,8 +20,10 @@ export default function Auth() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false); // Dodaj stan do przełączania między logowaniem a rejestracją
+  const [isRegistering, setIsRegistering] = useState(false); // Przełącznik między logowaniem a rejestracją
+  const navigation = useNavigation<AuthScreenNavigationProp>(); // Użycie typów nawigacji
 
+  // Funkcja do obsługi rejestracji
   const handleRegister = async () => {
     try {
       const response = await axios.post('http://localhost:3000/auth/register', { username, password });
@@ -21,6 +33,7 @@ export default function Auth() {
       setIsLoggedIn(true);
       setErrors([]);
       await AsyncStorage.setItem('token', token);
+      navigation.navigate('AnimalList'); // Nawigacja do ekranu AnimalList
     } catch (error: any) {
       if (error.response && error.response.data.errors) {
         setErrors(error.response.data.errors.map((err: any) => err.msg));
@@ -30,6 +43,7 @@ export default function Auth() {
     }
   };
 
+  // Funkcja do obsługi logowania
   const handleLogin = async () => {
     try {
       const response = await axios.post('http://localhost:3000/auth/login', { username, password });
@@ -38,14 +52,16 @@ export default function Auth() {
       setMessage(`Hello ${username}`);
       setIsLoggedIn(true);
       setErrors([]);
+      navigation.navigate('AnimalList'); // Nawigacja do ekranu AnimalList
     } catch (error: any) {
       setMessage('Error logging in');
       setErrors([error.message]);
     }
   };
 
+  // Jeśli użytkownik jest zalogowany, wyświetl listę zwierząt
   if (isLoggedIn) {
-    return <AnimalList />; 
+    return <AnimalList />;
   }
 
   return (

@@ -4,8 +4,11 @@ import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes';
 import animalRoutes from './routes/animalRoutes';
 import Message from './models/Message';
+import { errorHandler } from './middleware/errorHandler';
+
 
 const app : any = express();
+app.use(errorHandler);
 app.use(bodyParser.json());
 
 app.use('/auth', authRoutes);

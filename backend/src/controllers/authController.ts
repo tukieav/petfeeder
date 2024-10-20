@@ -2,8 +2,11 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import dotenv from 'dotenv';
 
-const JWT_SECRET = 'your_jwt_secret_key';
+dotenv.config();
+
+const JWT_SECRET : any = process.env.JWT_SECRET
 
 export const register : any = async (req: Request, res: Response) => {
   const { username, password } : any = req.body;

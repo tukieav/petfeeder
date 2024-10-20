@@ -32,30 +32,32 @@ const AnimalList = () => {
       if (!token) {
         throw new Error('No token found');
       }
-
+      console.log('Token:', token);
+  
       const response = await axios.get('http://localhost:3000/animals', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log('Fetched animals:', response.data);
       setAnimals(response.data);
     } catch (error) {
       console.error('Error fetching animals:', error);
     }
   };
 
-  // Listener na focus, aby odświeżać listę zwierząt po powrocie na ekran
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      fetchAnimals(); // Odśwież listę zwierząt, gdy ekran jest aktywowany
+      console.log('Screen focused, fetching animals...');
+      fetchAnimals();
     });
 
-    return unsubscribe; // Usuń listener, gdy komponent zostanie odmontowany
+    return unsubscribe;
   }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <FlatList
+        <FlatList
         data={animals}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (

@@ -3,6 +3,8 @@ import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { apiGet } from '../utils/api';
+
 
 const EditAnimal = () => {
   const [type, setType] = useState('');
@@ -20,17 +22,7 @@ const EditAnimal = () => {
   useEffect(() => {
     const fetchAnimalDetails = async () => {
       try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) {
-          throw new Error('No token found');
-        }
-
-        const response = await axios.get(`http://localhost:3000/animals/${animalId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const response = await apiGet(`/animals/${animalId}`);
         const animal = response.data;
         setType(animal.type);
         setBreed(animal.breed);
