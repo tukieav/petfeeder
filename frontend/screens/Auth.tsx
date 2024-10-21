@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { handleAuthRequest } from '../services/authService';
+import { extractErrorMessages } from '../utils/errorUtils';
 
 type RootStackParamList = {
   Auth: undefined;
@@ -19,16 +19,13 @@ export default function Auth() {
   const [isRegistering, setIsRegistering] = useState(false);
   const navigation = useNavigation<AuthScreenNavigationProp>();
 
-  const handleAuth = async (isRegister: boolean) => {
+  const handleAuth = async () => {
     try {
-      const endpoint = isRegister ? '/auth/register' : '/auth/login';
-      const response = await axios.post(`http://localhost:3000${endpoint}`, { username, password });
-      const token = response.data.token;
-      await AsyncStorage.setItem('token', token);
+      await handleAuthRequest(isRegistering, { username, password });
       setErrors([]);
       navigation.navigate('AnimalList');
     } catch (error: any) {
-      setErrors(error.response?.data?.errors?.map((err: any) => err.msg) || [error.message]);
+      setErrors(extractErrorMessages(error));
     }
   };
 
@@ -37,7 +34,7 @@ export default function Auth() {
       <Text style={styles.title}>{isRegistering ? 'Register' : 'Login'}</Text>
       <TextInput style={styles.input} placeholder="Username" value={username} onChangeText={setUsername} />
       <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
-      <Button title={isRegistering ? 'Register' : 'Login'} onPress={() => handleAuth(isRegistering)} />
+      <Button title={isRegistering ? 'Register' : 'Login'} onPress={handleAuth} />
       <Button title={isRegistering ? 'Already have an account? Login' : 'Don’t have an account? Register'} onPress={() => setIsRegistering(!isRegistering)} />
       {errors.length > 0 && errors.map((error, index) => <Text key={index} style={styles.errorText}>{error}</Text>)}
     </View>
@@ -45,8 +42,24 @@ export default function Auth() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
-  title: { fontSize: 24, marginBottom: 16, textAlign: 'center' },
-  input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 12, paddingHorizontal: 8 },
-  errorText: { color: 'red' },
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+  },
 });

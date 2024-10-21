@@ -16,68 +16,68 @@ interface AnimalFormProps {
 }
 
 export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
-  type, breed, name, birthDate, diet, chronicDiseases, setFormData, handleSubmit, message, error, buttonText
-}) => {
-  const handleInputChange = (field: keyof AnimalFormProps, value: string) => {
-    setFormData({ [field]: value });
-  };
+    type, breed, name, birthDate, diet, chronicDiseases, setFormData, handleSubmit, message, error, buttonText
+  }) => {
+    const handleInputChange = (field: keyof AnimalFormProps, value: string) => {
+      setFormData({ [field]: value });
+    };
 
-  return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Type"
-        value={type}
-        onChangeText={(value) => handleInputChange('type', value)}
-      />
-      {error?.type && <Text style={styles.errorText}>{error.type}</Text>}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Breed"
-        value={breed}
-        onChangeText={(value) => handleInputChange('breed', value)}
-      />
-      {error?.breed && <Text style={styles.errorText}>{error.breed}</Text>}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={(value) => handleInputChange('name', value)}
-      />
-      {error?.name && <Text style={styles.errorText}>{error.name}</Text>}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Birth Date (YYYY-MM-DD)"
-        value={birthDate}
-        onChangeText={(value) => handleInputChange('birthDate', value)}
-      />
-      {error?.birthDate && <Text style={styles.errorText}>{error.birthDate}</Text>}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Diet"
-        value={diet}
-        onChangeText={(value) => handleInputChange('diet', value)}
-      />
-      {error?.diet && <Text style={styles.errorText}>{error.diet}</Text>}
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Chronic Diseases"
-        value={chronicDiseases}
-        onChangeText={(value) => handleInputChange('chronicDiseases', value)}
-      />
-      {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
-      
-      <Button title={buttonText} onPress={handleSubmit} />
-      {message ? <Text style={styles.successText}>{message}</Text> : null}
-      {error?.general && <Text style={styles.errorText}>{error.general}</Text>}
-    </View>
-  );
-};
+    return (
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder="Type"
+          value={type}
+          onChangeText={(value) => handleInputChange('type', value)}
+        />
+        {typeof error?.type === 'string' && <Text style={styles.errorText}>{error.type}</Text>}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Breed"
+          value={breed}
+          onChangeText={(value) => handleInputChange('breed', value)}
+        />
+        {typeof error?.breed === 'string' && <Text style={styles.errorText}>{error.breed}</Text>}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={(value) => handleInputChange('name', value)}
+        />
+        {typeof error?.name === 'string' && <Text style={styles.errorText}>{error.name}</Text>}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Birth Date (YYYY-MM-DD)"
+          value={birthDate}
+          onChangeText={(value) => handleInputChange('birthDate', value)}
+        />
+        {typeof error?.birthDate === 'string' && <Text style={styles.errorText}>{error.birthDate}</Text>}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Diet"
+          value={diet}
+          onChangeText={(value) => handleInputChange('diet', value)}
+        />
+        {typeof error?.diet === 'string' && <Text style={styles.errorText}>{error.diet}</Text>}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Chronic Diseases"
+          value={chronicDiseases}
+          onChangeText={(value) => handleInputChange('chronicDiseases', value)}
+        />
+        {typeof error?.chronicDiseases === 'string' && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
+        
+        <Button title={buttonText} onPress={handleSubmit} />
+        {typeof message === 'string' && <Text style={styles.successText}>{message}</Text>}
+        {typeof error?.general === 'string' && <Text style={styles.errorText}>{error.general}</Text>}
+      </View>
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {

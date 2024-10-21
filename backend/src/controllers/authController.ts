@@ -39,3 +39,12 @@ export const login : any = async (req: Request, res: Response) => {
     res.status(500).send('Error logging in');
   }
 };
+ 
+export const logout = async (req: Request, res: Response) => {
+  try {
+    // Perform any necessary cleanup, such as invalidating the token
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error : any) {
+    res.status(500).json({ message: 'Logout failed', error: error.message });
+  }
+};

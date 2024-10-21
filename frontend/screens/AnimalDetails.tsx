@@ -1,51 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { getAnimalDetails, deleteAnimal } from '../services/animalService'; // Import funkcji z animalService
 
-// Definiowanie typów dla nawigacji
 type RootStackParamList = {
     AnimalList: undefined;
     AnimalDetails: { animalId: string };
-    EditAnimal: { animalId: string };
+    AnimalForm: { animalId: string };
 };
 
-type EditAnimalNavigationProp = StackNavigationProp<RootStackParamList, 'EditAnimal'>;
+type EditAnimalNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalForm'>;
 
 const AnimalDetails = () => {
   const [animal, setAnimal] = useState<any>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true); // Dodano stan ładowania
   const route = useRoute();
   const navigation = useNavigation<EditAnimalNavigationProp>();
   const { animalId } = route.params as { animalId: string };
 
   const fetchAnimalDetails = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      const response = await axios.get(`http://localhost:3000/animals/${animalId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setAnimal(response.data);
+      const animalData = await getAnimalDetails(animalId); // Użycie funkcji z animalService
+      console.log('Fetched animal data:', animalData); // Debugging: log the fetched data
+      setAnimal(animalData);
+      setLoading(false); // Zakończenie ładowania po pobraniu danych
     } catch (err: any) {
       setError(err.message || 'Error fetching animal details');
+      setLoading(false); // Zakończenie ładowania nawet w przypadku błędu
     }
   };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchAnimalDetails(); 
-    });
-
-    return unsubscribe; 
-  }, [navigation]);
 
   useEffect(() => {
     fetchAnimalDetails(); 
@@ -53,30 +38,24 @@ const AnimalDetails = () => {
 
   const handleDelete = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      await axios.delete(`http://localhost:3000/animals/${animalId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      Alert.alert('Success', 'Animal deleted successfully');
-      navigation.goBack(); // Powrót do listy zwierząt
+      const result = await deleteAnimal(animalId);
+      Alert.alert('Success', result.message);
+      navigation.goBack();
     } catch (err: any) {
       setError(err.message || 'Error deleting animal');
     }
   };
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
   if (error) {
     return <Text>{error}</Text>;
   }
 
   if (!animal) {
-    return <Text>Loading...</Text>;
+    return <Text>No animal data available</Text>;
   }
 
   return (
@@ -87,7 +66,7 @@ const AnimalDetails = () => {
       <Text>Birth Date: {animal.birthDate}</Text>
       <Text>Diet: {animal.diet}</Text>
       <Text>Chronic Diseases: {animal.chronicDiseases}</Text>
-      <Button title="Edit Animal" onPress={() => navigation.navigate('EditAnimal', { animalId })} />
+      <Button title="Edit Animal" onPress={() => navigation.navigate('AnimalForm', { animalId })} />
       <Button title="Delete Animal" onPress={handleDelete} />
       <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>

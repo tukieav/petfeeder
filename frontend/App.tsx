@@ -1,39 +1,13 @@
-import React, { Component, ErrorInfo, PropsWithChildren } from 'react';
-import { View, Text, Button } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import StackNavigator from './navigation/StackNavigator'; 
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
+const App = () => {
+  return (
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
+  );
+};
 
-class ErrorBoundary extends Component<PropsWithChildren<{}>, ErrorBoundaryState> {
-  constructor(props: PropsWithChildren<{}>) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
-  }
-
-  handleRetry = () => {
-    this.setState({ hasError: false, error: null });
-  };
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <View>
-          <Text>Something went wrong. Please try again.</Text>
-          <Button title="Retry" onPress={this.handleRetry} />
-        </View>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+export default App;
