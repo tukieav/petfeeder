@@ -1,72 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, FlatList, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { getAnimals } from '../services/animalService';
+import { logout } from '../services/authService';
+import { RootStackParamList } from '../navigation/StackNavigator';
 
-type RootStackParamList = {
-  AnimalDetails: { animalId: string };
-  AddAnimal: undefined;
-  EditAnimal: { animalId: string }; 
-};
-
-type AnimalDetailsNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalDetails'>;
-type AddAnimalNavigationProp = StackNavigationProp<RootStackParamList, 'AddAnimal'>;
-
-interface Animal {
-  _id: string;
-  name: string;
-  type: string;
-  breed: string;
-}
+type AnimalListNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalForm'>;
 
 const AnimalList = () => {
-  const [animals, setAnimals] = useState<Animal[]>([]);
-  const navigation = useNavigation<AnimalDetailsNavigationProp>();
+  const [animals, setAnimals] = useState([]);
+  const navigation = useNavigation<AnimalListNavigationProp>();
 
-  // Funkcja do pobierania listy zwierząt
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', fetchAnimals);
+    return unsubscribe;
+  }, [navigation]);
+
   const fetchAnimals = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
-      }
-      console.log('Token:', token);
-  
-      const response = await axios.get('http://localhost:3000/animals', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('Fetched animals:', response.data);
-      setAnimals(response.data);
-    } catch (error) {
+      const data: any = await getAnimals();
+      setAnimals(data);
+    } catch (error: any) {
       console.error('Error fetching animals:', error);
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Screen focused, fetching animals...');
-      fetchAnimals();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      Alert.alert('Logged out', 'You have been logged out successfully');
+      navigation.navigate('Auth' as never);
+    } catch (error: any) {
+      console.error('Error logging out:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-        <FlatList
+      <FlatList
         data={animals}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item: any) => item._id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('AnimalDetails', { animalId: item._id })}>
+          <TouchableOpacity onPress={() => navigation.navigate('AnimalForm', { animalId: item._id })}>
             <Text>{item.name}</Text>
           </TouchableOpacity>
         )}
       />
-      <Button title="Add Animal" onPress={() => navigation.navigate('AddAnimal')} />
+      <Button title="Add Animal" onPress={() => navigation.navigate('AnimalForm' as never)} />
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };

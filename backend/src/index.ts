@@ -3,35 +3,16 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import authRoutes from './routes/authRoutes';
 import animalRoutes from './routes/animalRoutes';
-import Message from './models/Message';
 import { errorHandler } from './middleware/errorHandler';
 
-
-const app : any = express();
-app.use(errorHandler);
+const app = express();
 app.use(bodyParser.json());
-
 app.use('/auth', authRoutes);
 app.use('/animals', animalRoutes);
+app.use(errorHandler);
 
-mongoose.connect('mongodb://localhost:27017/pet-health-book')
-  .then(async () => {
-    const existingMessage : any = await Message.findOne();
-    if (!existingMessage) {
-      const message : any = new Message({ text: 'hello world' });
-      await message.save();
-    }
-    app.listen(3000, () => {
-      console.log('Server is running on port 3000');
-    });
+mongoose.connect('mongodb://localhost:27017/petfeeder')
+  .then(() => {
+    app.listen(3000, () => console.log('Server running on port 3000'));
   })
-  .catch(err => console.error(err));
-
-app.get('/', async (req : any, res : any) => {
-  try {
-    const message : any = await Message.findOne();
-    res.send(message ? message.text : 'No message found');
-  } catch (error) {
-    res.status(500).send('Error retrieving message');
-  }
-});
+  .catch(err => console.error('Database connection error:', err));

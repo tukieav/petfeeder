@@ -2,19 +2,26 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import Auth from '../screens/Auth';
 import AnimalList from '../screens/AnimalList';
-import AddAnimal from '../screens/AddAnimal';
+import AnimalForm from '../screens/AnimalForm';
 import AnimalDetails from '../screens/AnimalDetails';
-import EditAnimal from '../screens/EditAnimal';
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Auth: undefined;
+  AnimalList: undefined;
+  AnimalForm: { animalId?: string };
+  AnimalDetails: { animalId: string };
+};
+
+export type { RootStackParamList };
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => (
   <Stack.Navigator initialRouteName="Auth">
     <Stack.Screen name="Auth" component={Auth} />
     <Stack.Screen name="AnimalList" component={AnimalList} />
-    <Stack.Screen name="AddAnimal" component={AddAnimal} />
+    <Stack.Screen name="AnimalForm" component={AnimalForm} />
     <Stack.Screen name="AnimalDetails" component={AnimalDetails} />
-    <Stack.Screen name="EditAnimal" component={EditAnimal} />
   </Stack.Navigator>
 );
 

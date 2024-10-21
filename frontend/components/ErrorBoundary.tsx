@@ -28,7 +28,7 @@ class ErrorBoundary extends Component<PropsWithChildren<{}>, ErrorBoundaryState>
     if (this.state.hasError) {
       return (
         <View>
-          <Text>Something went wrong.</Text>
+          <Text>Something went wrong. Please try again.</Text>
           <Button title="Retry" onPress={this.handleRetry} />
         </View>
       );

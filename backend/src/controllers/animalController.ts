@@ -1,22 +1,12 @@
 import { Request, Response } from 'express';
 import Animal from '../models/Animal';
 
-// Tworzenie nowego zwierzęcia
-export const createAnimal : any = async (req: Request, res: Response) => {
-  const { type, breed, name, birthDate, diet, chronicDiseases } : any = req.body;
-  const userId : any = req.user?.userId;
+export const createAnimal = async (req: Request, res: Response) => {
+  const { type, breed, name, birthDate, diet, chronicDiseases } = req.body;
+  const userId = req.user?.userId;
 
   try {
-    const animal : any = new Animal({
-      userId,
-      type,
-      breed,
-      name,
-      birthDate,
-      diet,
-      chronicDiseases,
-    });
-
+    const animal = new Animal({ userId, type, breed, name, birthDate, diet, chronicDiseases });
     await animal.save();
     res.status(201).json(animal);
   } catch (error) {
@@ -24,22 +14,20 @@ export const createAnimal : any = async (req: Request, res: Response) => {
   }
 };
 
-// Pobieranie listy wszystkich zwierząt
-export const getAnimals : any = async (req: Request, res: Response) => {
+export const getAnimals = async (req: Request, res: Response) => {
   try {
-    const animals : any = await Animal.find({ userId: req.user?.userId });
+    const animals = await Animal.find({ userId: req.user?.userId });
     res.status(200).json(animals);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching animals', error });
   }
 };
 
-// Pobieranie szczegółów zwierzęcia po ID
-export const getAnimalById : any = async (req: Request, res: Response) => {
-  const { id } : any = req.params;
+export const getAnimalById = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
   try {
-    const animal : any = await Animal.findById(id);
+    const animal = await Animal.findById(id);
     if (!animal || animal.userId.toString() !== req.user?.userId) {
       return res.status(404).json({ message: 'Animal not found' });
     }
@@ -48,25 +36,17 @@ export const getAnimalById : any = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching animal', error });
   }
 };
-
-// Aktualizacja zwierzęcia po ID
-export const updateAnimal : any = async (req: Request, res: Response) => {
-  const { id } : any = req.params;
-  const { type, breed, name, birthDate, diet, chronicDiseases } : any = req.body;
+export const updateAnimal = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { type, breed, name, birthDate, diet, chronicDiseases } = req.body;
 
   try {
-    const animal : any = await Animal.findById(id);
+    const animal = await Animal.findById(id);
     if (!animal || animal.userId.toString() !== req.user?.userId) {
       return res.status(404).json({ message: 'Animal not found' });
     }
 
-    animal.type = type;
-    animal.breed = breed;
-    animal.name = name;
-    animal.birthDate = birthDate;
-    animal.diet = diet;
-    animal.chronicDiseases = chronicDiseases;
-
+    Object.assign(animal, { type, breed, name, birthDate, diet, chronicDiseases });
     await animal.save();
     res.status(200).json(animal);
   } catch (error) {
@@ -74,21 +54,18 @@ export const updateAnimal : any = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteAnimal : any = async (req: Request, res: Response) => {
-    const { id } = req.params;
-  
-    try {
-      const animal : any = await Animal.findById(id);
-      if (!animal || animal.userId.toString() !== req.user?.userId) {
-        return res.status(404).json({ message: 'Animal not found' });
-      }
-  
-      // Zamiast animal.remove(), użyj deleteOne() lub findByIdAndDelete
-      await Animal.findByIdAndDelete(id); // Usuwa zwierzę bezpośrednio z bazy danych
-  
-      res.status(200).json({ message: 'Animal deleted' });
-    } catch (error) {
-      console.error('Error deleting animal:', error);
-      res.status(500).json({ message: 'Error deleting animal', error });
+export const deleteAnimal = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const animal = await Animal.findById(id);
+    if (!animal || animal.userId.toString() !== req.user?.userId) {
+      return res.status(404).json({ message: 'Animal not found' });
     }
-  };
+
+    await Animal.findByIdAndDelete(id);
+    res.status(200).json({ message: 'Animal deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting animal', error });
+  }
+};
