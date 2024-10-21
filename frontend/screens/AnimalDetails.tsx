@@ -6,7 +6,7 @@ import { getAnimalDetails, deleteAnimal } from '../services/animalService'; // I
 
 type RootStackParamList = {
     AnimalList: undefined;
-    AnimalDetails: { animalId: string };
+    AnimalDetails: { animalId: string, updated?: boolean };
     AnimalForm: { animalId: string };
 };
 
@@ -33,8 +33,12 @@ const AnimalDetails = () => {
   };
 
   useEffect(() => {
-    fetchAnimalDetails(); 
-  }, [animalId]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchAnimalDetails();
+    });
+
+    return unsubscribe;
+  }, [navigation, animalId]);
 
   const handleDelete = async () => {
     try {

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack'; // Import typów nawigacji
 import { AnimalFormComponent } from '../components/AnimalFormComponent';
 import { getAnimalDetails, saveAnimal } from '../services/animalService';
 import { validateAnimalForm } from '../utils/validation';
 import { Text } from 'react-native';
+import { RootStackParamList } from '../navigation/StackNavigator'; // Import typów z nawigacji
 
 type AnimalFormRouteParams = {
   animalId?: string;
@@ -21,8 +23,10 @@ const AnimalForm = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Typowanie nawigacji i trasy
   const route = useRoute<RouteProp<{ params: AnimalFormRouteParams }, 'params'>>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList, 'AnimalDetails'>>();  
   const { animalId } = route.params || {};
 
   useEffect(() => {
@@ -72,9 +76,9 @@ const AnimalForm = () => {
     }
   
     try {
-      const result = await saveAnimal(formData, animalId); 
+      const result = await saveAnimal(formData, animalId);
       setMessage(result.message);
-      navigation.goBack();
+      navigation.navigate('AnimalDetails', { animalId: animalId || '', updated: true }); 
     } catch (err: any) {
       setError(err.message || 'Error saving animal');
     }

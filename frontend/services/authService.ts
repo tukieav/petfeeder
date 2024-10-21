@@ -1,6 +1,5 @@
-import axios from 'axios';
+import { apiPost } from '../utils/api'; // Import funkcji z api.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE_URL } from '../config';
 
 export const storeToken = async (token: string) => {
   await AsyncStorage.setItem('token', token);
@@ -14,27 +13,20 @@ export const getToken = async (): Promise<string> => {
 
 export const handleAuthRequest = async (isRegister: boolean, credentials: { username: string; password: string }) => {
   const endpoint = isRegister ? '/auth/register' : '/auth/login';
-  const response = await axios.post(`${API_BASE_URL}${endpoint}`, credentials);
+  const response = await apiPost(endpoint, credentials); 
   await storeToken(response.data.token);
 };
 
 export const logout = async () => {
-    try {
-      const token = await getToken();
-      console.log('Token during logout:', token);
-  
-      const response = await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('Logout response:', response.data);
-  
-      await AsyncStorage.removeItem('token');
-      const tokenAfterLogout = await AsyncStorage.getItem('token');
-      console.log('Token after logout:', tokenAfterLogout); // Should be null
+  try {
+    const response = await apiPost('/auth/logout', {}); 
+    console.log('Logout response:', response.data);
+
+    await AsyncStorage.removeItem('token');
+    const tokenAfterLogout = await AsyncStorage.getItem('token');
+    console.log('Token after logout:', tokenAfterLogout);
     } catch (error) {
-      console.error('Error during logout:', error);
-      throw new Error('Logout failed');
+    console.error('Error during logout:', error);
+    throw new Error('Logout failed');
     }
-  };
+    };
