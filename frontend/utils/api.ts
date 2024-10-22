@@ -10,14 +10,15 @@ const getToken = async (): Promise<string> => {
 };
 
 const apiRequest = async (method: 'get' | 'post' | 'put' | 'delete', url: string, data?: any) => {
-  const token = await getToken();
-  return axios({
-    method,
-    url: `${API_BASE_URL}${url}`,
-    data,
-    headers: { Authorization: `Bearer ${token}` },
-  });
-};
+    const token = await getToken();
+    console.log('Using token in request:', token);
+    return axios({
+      method,
+      url: `${API_BASE_URL}${url}`,
+      data,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  };
 
 export const apiGet = (url: string) => apiRequest('get', url);
 export const apiPost = (url: string, data: any) => apiRequest('post', url, data);
