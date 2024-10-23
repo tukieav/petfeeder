@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { getAnimalDetails, deleteAnimal } from '../services/animalService'; // Import funkcji z animalService
+import { getAnimalDetails, deleteAnimal } from '../services/animalService';
 
 type RootStackParamList = {
-    AnimalList: undefined;
-    AnimalDetails: { animalId: string, updated?: boolean };
-    AnimalForm: { animalId: string };
+  AnimalList: undefined;
+  AnimalDetails: { animalId: string, updated?: boolean };
+  AnimalForm: { animalId: string };
 };
 
 type EditAnimalNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalForm'>;
@@ -15,20 +15,19 @@ type EditAnimalNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalF
 const AnimalDetails = () => {
   const [animal, setAnimal] = useState<any>(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // Dodano stan ładowania
+  const [loading, setLoading] = useState(true);
   const route = useRoute();
   const navigation = useNavigation<EditAnimalNavigationProp>();
   const { animalId } = route.params as { animalId: string };
 
   const fetchAnimalDetails = async () => {
     try {
-      const animalData = await getAnimalDetails(animalId); // Użycie funkcji z animalService
-      console.log('Fetched animal data:', animalData); // Debugging: log the fetched data
+      const animalData = await getAnimalDetails(animalId);
       setAnimal(animalData);
-      setLoading(false); // Zakończenie ładowania po pobraniu danych
+      setLoading(false);
     } catch (err: any) {
       setError(err.message || 'Error fetching animal details');
-      setLoading(false); // Zakończenie ładowania nawet w przypadku błędu
+      setLoading(false);
     }
   };
 
