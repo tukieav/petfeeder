@@ -42,7 +42,9 @@ const AnimalList = () => {
         data={animals}
         keyExtractor={(item: any) => item._id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('AnimalDetails', { animalId: item._id })}>
+          <TouchableOpacity onPress={() => {
+            navigation.navigate('AnimalDetails', { animalId: item._id });
+          }}>
             <Text>{item.name}</Text>
           </TouchableOpacity>
         )}

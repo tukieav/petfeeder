@@ -9,7 +9,7 @@ type RootStackParamList = {
   Auth: undefined;
   AnimalList: undefined;
   AnimalForm: { animalId?: string };
-  AnimalDetails: { animalId: string };
+  AnimalDetails: { animalId: string; updated?: boolean };
 };
 
 export type { RootStackParamList };

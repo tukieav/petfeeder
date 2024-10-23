@@ -20,29 +20,30 @@ export const register : any = async (req: Request, res: Response) => {
   }
 };
 
-export const login : any = async (req: Request, res: Response) => {
-  const { username, password } : any = req.body;
+export const login = async (req: Request, res: Response) => {
+  const { username, password } = req.body;
   try {
-    const user : any = await User.findOne({ username });
+    const user = await User.findOne({ username });
     if (!user) {
       res.status(400).send('Invalid credentials');
       return;
     }
-    const isPasswordValid : boolean = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       res.status(400).send('Invalid credentials');
       return;
     }
-    const token : string = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+
+    const token = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+
     res.json({ token });
-  } catch (error : any) {
+  } catch (error) {
     res.status(500).send('Error logging in');
   }
 };
  
 export const logout = async (req: Request, res: Response) => {
   try {
-    // Perform any necessary cleanup, such as invalidating the token
     res.status(200).json({ message: 'Logout successful' });
   } catch (error : any) {
     res.status(500).json({ message: 'Logout failed', error: error.message });

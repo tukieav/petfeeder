@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Animal from '../models/Animal';
 
-// Tworzenie nowego zwierzęcia
 export const createAnimal = async (req: Request, res: Response, next: NextFunction) => {
   const { type, breed, name, birthDate, diet, chronicDiseases } = req.body;
 
@@ -16,6 +15,8 @@ export const createAnimal = async (req: Request, res: Response, next: NextFuncti
       chronicDiseases,
     });
 
+    console.log('Animal to be saved:', newAnimal); // Dodaj logowanie danych przed zapisem
+
     await newAnimal.save();
     res.status(201).json(newAnimal);
   } catch (error) {
@@ -23,23 +24,21 @@ export const createAnimal = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// Pobieranie wszystkich zwierząt
 export const getAnimals = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const animals = await Animal.find({ userId: req.user?.userId });
       res.status(200).json({ data: animals });
     } catch (error) {
+      console.error('Error saving animal:', error); // Dodaj pełne logowanie błędu
       next(error);
     }
   };
 
-// Pobieranie zwierzęcia po ID
 export const getAnimalById = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 
   try {
     const animal = await Animal.findById(id);
-    console.log('Animal found in database:', animal);
     if (!animal || animal.userId.toString() !== req.user?.userId) {
     return res.status(404).json({ message: 'Animal not found or unauthorized' });
     }
@@ -49,7 +48,6 @@ export const getAnimalById = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// Aktualizacja zwierzęcia
 export const updateAnimal = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { type, breed, name, birthDate, diet, chronicDiseases } = req.body;
@@ -59,8 +57,6 @@ export const updateAnimal = async (req: Request, res: Response, next: NextFuncti
     if (!animal || animal.userId.toString() !== req.user?.userId) {
       return res.status(404).json({ message: 'Animal not found or unauthorized' });
     }
-
-    // Aktualizacja danych zwierzęcia
     Object.assign(animal, { type, breed, name, birthDate, diet, chronicDiseases });
     await animal.save();
 
@@ -70,7 +66,6 @@ export const updateAnimal = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-// Usuwanie zwierzęcia
 export const deleteAnimal = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
 

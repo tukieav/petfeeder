@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { AnimalFormComponent } from '../components/AnimalFormComponent';
 import { getAnimalDetails, saveAnimal } from '../services/animalService';
 import { validateAnimalForm } from '../utils/validation';
@@ -26,6 +27,7 @@ const AnimalForm = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+
   const route = useRoute<RouteProp<{ params: AnimalFormRouteParams }, 'params'>>();
   const navigation = useNavigation<AnimalFormNavigationProp>(); 
   const { animalId } = route.params || {};
@@ -34,7 +36,6 @@ const AnimalForm = () => {
     if (animalId) {
       getAnimalDetails(animalId)
         .then((animal: any) => {
-          console.log('Fetched animal data:', animal);
           setFormData({
             type: animal.type || '',
             breed: animal.breed || '',
@@ -70,12 +71,12 @@ const AnimalForm = () => {
       formData.diet,
       formData.chronicDiseases
     );
-  
+
     if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors); 
-      return; 
+      setError(validationErrors);
+      return;
     }
-  
+
     try {
       const result = await saveAnimal(formData, animalId); 
       setMessage(result.message);
@@ -96,7 +97,7 @@ const AnimalForm = () => {
       handleSubmit={handleSubmit}
       message={message}
       error={error}
-      buttonText={animalId ? 'Save Changes' : 'Add Animal'}
+      buttonText={animalId ? 'Save Changes' : 'Save Animal'}
     />
   );
 };
