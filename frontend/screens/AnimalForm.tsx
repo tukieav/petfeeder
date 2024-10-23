@@ -4,6 +4,11 @@ import { AnimalFormComponent } from '../components/AnimalFormComponent';
 import { getAnimalDetails, saveAnimal } from '../services/animalService';
 import { validateAnimalForm } from '../utils/validation';
 import { Text } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack'; // Dodaj import StackNavigationProp
+import { RootStackParamList } from '../navigation/StackNavigator'; // Importuj typy nawigacji
+
+type AnimalFormNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalList'>;
+
 
 type AnimalFormRouteParams = {
   animalId?: string;
@@ -22,7 +27,7 @@ const AnimalForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const route = useRoute<RouteProp<{ params: AnimalFormRouteParams }, 'params'>>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<AnimalFormNavigationProp>(); 
   const { animalId } = route.params || {};
 
   useEffect(() => {
@@ -74,7 +79,7 @@ const AnimalForm = () => {
     try {
       const result = await saveAnimal(formData, animalId); 
       setMessage(result.message);
-      navigation.goBack();
+      navigation.navigate('AnimalList'); // Zamiast goBack, przejdź do AnimalList
     } catch (err: any) {
       setError(err.message || 'Error saving animal');
     }
