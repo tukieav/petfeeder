@@ -5,7 +5,6 @@ import { AnimalFormComponent } from '../components/AnimalFormComponent';
 import { getAnimalDetails, saveAnimal } from '../services/animalService';
 import { validateAnimalForm } from '../utils/validation';
 import { Text } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack'; // Dodaj import StackNavigationProp
 import { RootStackParamList } from '../navigation/StackNavigator'; // Importuj typy nawigacji
 
 type AnimalFormNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalList'>;
