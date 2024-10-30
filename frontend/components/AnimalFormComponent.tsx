@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, TextInput, Text, Button, StyleSheet } from 'react-native';
+import  MaskInput, { Masks } from 'react-native-mask-input';
+
 
 interface AnimalFormProps {
   type: string;
@@ -48,13 +50,14 @@ export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
         />
         {typeof error?.name === 'string' && <Text style={styles.errorText}>{error.name}</Text>}
         
-        <TextInput
-          style={styles.input}
-          placeholder="Birth Date (YYYY-MM-DD)"
-          value={birthDate}
-          onChangeText={(value) => handleInputChange('birthDate', value)}
-        />
-        {typeof error?.birthDate === 'string' && <Text style={styles.errorText}>{error.birthDate}</Text>}
+        <MaskInput
+            style={styles.input}
+            placeholder="Birth Date (YYYY-MM-DD)"
+            value={birthDate}
+            onChangeText={(mask) => handleInputChange('birthDate', mask)}
+            mask={[/\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
+          />
+          {typeof error?.birthDate === 'string' && <Text style={styles.errorText}>{error.birthDate}</Text>}
         
         <TextInput
           style={styles.input}
