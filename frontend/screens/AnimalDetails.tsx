@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { getAnimalDetails, deleteAnimal } from '../services/animalService';
+import { apiGet } from '../utils/api';
 
 type RootStackParamList = {
   AnimalList: undefined;
@@ -41,7 +42,12 @@ const AnimalDetails = () => {
 
   const handleDelete = async () => {
     try {
-      const result = await deleteAnimal(animalId);
+      // Pobierz token CSRF
+      const csrfResponse = await apiGet('/auth/csrf-token', false);
+      const csrfToken = csrfResponse.data.csrfToken;
+  
+      // Usuń zwierzę z tokenem CSRF
+      const result = await deleteAnimal(animalId, { 'X-CSRF-Token': csrfToken });
       Alert.alert('Success', result.message);
       navigation.goBack();
     } catch (err: any) {

@@ -5,7 +5,7 @@ import { AnimalFormComponent } from '../components/AnimalFormComponent';
 import { getAnimalDetails, saveAnimal } from '../services/animalService';
 import { validateAnimalForm } from '../utils/validation';
 import { Text } from 'react-native';
-import { RootStackParamList } from '../navigation/StackNavigator'; // Importuj typy nawigacji
+import { RootStackParamList } from '../navigation/StackNavigator';
 
 type AnimalFormNavigationProp = StackNavigationProp<RootStackParamList, 'AnimalList'>;
 
@@ -70,18 +70,22 @@ const AnimalForm = () => {
       formData.diet,
       formData.chronicDiseases
     );
-
+  
     if (Object.keys(validationErrors).length > 0) {
       setError(validationErrors);
       return;
     }
-
+  
     try {
-      const result = await saveAnimal(formData, animalId); 
+      const result = await saveAnimal(formData, animalId);
       setMessage(result.message);
-      navigation.navigate('AnimalList'); // Zamiast goBack, przejdź do AnimalList
+      navigation.navigate('AnimalList');
     } catch (err: any) {
-      setError(err.message || 'Error saving animal');
+      if (err.message.includes('CSRF')) {
+        setError('CSRF token validation failed. Please refresh the page and try again.');
+      } else {
+        setError(err.message || 'Error saving animal');
+      }
     }
   };
 

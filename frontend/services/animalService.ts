@@ -29,12 +29,17 @@ export const getAnimalDetails = async (animalId: string): Promise<Animal> => {
 
   export const saveAnimal = async (data: Partial<Animal>, animalId?: string): Promise<{ success: boolean; message: string }> => {
     try {
+      // Pobierz token CSRF
+      const csrfResponse = await apiGet('/auth/csrf-token', false);
+      const csrfToken = csrfResponse.data.csrfToken;
+  
       const formattedBirthDate = format(new Date(data.birthDate || ''), 'yyyy-MM-dd');
       const url = animalId ? `/animals/${animalId}` : '/animals';
       const method = animalId ? apiPut : apiPost;
   
-      const response = await method(url, { ...data, birthDate: formattedBirthDate });
-      console.log('Saving animal data:', data); // Dodaj logowanie danych
+      // Wyślij żądanie z tokenem CSRF
+      const response = await method(url, { ...data, birthDate: formattedBirthDate }, true, { 'X-CSRF-Token': csrfToken });
+      console.log('Saving animal data:', data);
       return { success: true, message: animalId ? 'Animal updated successfully' : 'Animal added successfully' };
     } catch (error: any) {
       throw new Error(`Error saving animal: ${error.message}`);
@@ -50,9 +55,9 @@ export const getAnimals = async (): Promise<Animal[]> => {
   }
 };
 
-export const deleteAnimal = async (animalId: string): Promise<{ success: boolean; message: string }> => {
+export const deleteAnimal = async (animalId: string, headers: any = {}): Promise<{ success: boolean; message: string }> => {
   try {
-    await apiDelete(`/animals/${animalId}`);
+    await apiDelete(`/animals/${animalId}`, true, headers);
     return { success: true, message: 'Animal deleted successfully' };
   } catch (error: any) {
     throw new Error(`Error deleting animal: ${error.message}`);

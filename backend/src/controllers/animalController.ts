@@ -15,7 +15,7 @@ export const createAnimal = async (req: Request, res: Response, next: NextFuncti
       chronicDiseases,
     });
 
-    console.log('Animal to be saved:', newAnimal); // Dodaj logowanie danych przed zapisem
+    console.log('Animal to be saved:', newAnimal);
 
     await newAnimal.save();
     res.status(201).json(newAnimal);
@@ -29,7 +29,7 @@ export const getAnimals = async (req: Request, res: Response, next: NextFunction
       const animals = await Animal.find({ userId: req.user?.userId });
       res.status(200).json({ data: animals });
     } catch (error) {
-      console.error('Error saving animal:', error); // Dodaj pełne logowanie błędu
+      console.error('Error saving animal:', error); 
       next(error);
     }
   };

@@ -1,37 +1,49 @@
-import { apiPost } from '../utils/api'; 
+import { apiPost, apiGet } from '../utils/api'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const storeToken = async (token: string) => {
-    
   await AsyncStorage.setItem('token', token);
 };
 
 export const getToken = async (): Promise<string> => {
+  const token = await AsyncStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+  return token;
+};
 
-    const token = await AsyncStorage.getItem('token');
+export const handleAuthRequest = async (isRegister: boolean, credentials: { username: string; password: string }) => {
+  const endpoint = isRegister ? '/auth/register' : '/auth/login';
 
-    if (!token) throw new Error('No token found');
-    return token;
-  };
+  // Pobierz token CSRF
+  const csrfResponse = await apiGet('/auth/csrf-token', false);
+  const csrfToken = csrfResponse.data.csrfToken;
 
-  export const handleAuthRequest = async (isRegister: boolean, credentials: { username: string; password: string }) => {
+  // Logowanie tokenu CSRF
+  console.log('CSRF Token received:', csrfToken);
 
-    const endpoint = isRegister ? '/auth/register' : '/auth/login';
-    const response = await apiPost(endpoint, credentials, false);
+  // Wyślij żądanie logowania z tokenem CSRF
+  const response = await apiPost(endpoint, credentials, false, { 'X-CSRF-Token': csrfToken });
+  console.log('CSRF Token sent:', csrfToken);
 
-    if (!response.data.token) {
-      throw new Error('No token received from server');
-    }
-    await storeToken(response.data.token);
+  if (!response.data.token) {
+    throw new Error('No token received from server');
+  }
+  await storeToken(response.data.token);
 };
 
 export const logout = async () => {
   try {
-    const response = await apiPost('/auth/logout', {}); 
+    // Pobierz token CSRF
+    const csrfResponse = await apiGet('/auth/csrf-token', false);
+    const csrfToken = csrfResponse.data.csrfToken;
 
+    // Wyślij żądanie wylogowania z tokenem CSRF
+    const response = await apiPost('/auth/logout', {}, false, { 'X-CSRF-Token': csrfToken });
+    
+    // Usuń token z pamięci
     await AsyncStorage.removeItem('token');
-    const tokenAfterLogout = await AsyncStorage.getItem('token');
   } catch (error) {
+    console.error('Logout failed:', error);
     throw new Error('Logout failed');
   }
 };
