@@ -104,32 +104,23 @@ export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
       />
       {error?.diet && <Text style={styles.errorText}>{error.diet}</Text>}
 
-      <RNPickerSelect
-        value={chronicDiseases}
-        onValueChange={(value) => handleInputChange('chronicDiseases', value)}
-        items={filteredChronicDiseases.map((option) => ({ label: option, value: option }))}
-      />
-      {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
-      
       <Text>Chronic Diseases:</Text>
       <MultiSelect
         items={filteredChronicDiseases.map((option) => ({ id: option, name: option }))}
         uniqueKey="id"
         onSelectedItemsChange={(selectedItems) => handleInputChange('chronicDiseases', selectedItems)}
-        selectedItems={chronicDiseases}
+        selectedItems={Array.isArray(chronicDiseases) ? chronicDiseases : []}
         selectText="Select Diseases"
         searchInputPlaceholderText="Search Diseases..."
       />
       {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
-
-
 
       <Text>Allergies:</Text>
       <MultiSelect
         items={filteredAllergies.map((option) => ({ id: option, name: option }))}
         uniqueKey="id"
         onSelectedItemsChange={(selectedItems) => handleInputChange('allergies', selectedItems)}
-        selectedItems={allergies}
+        selectedItems={Array.isArray(allergies) ? allergies : []}
         selectText="Select Allergies"
         searchInputPlaceholderText="Search Allergies..."
       />

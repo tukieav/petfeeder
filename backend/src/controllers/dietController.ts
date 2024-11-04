@@ -27,6 +27,7 @@ export const generateDiet = async (req: Request, res: Response, next: NextFuncti
           - Name: ${animal.name}
           - Birth Date: ${animal.birthDate}
           - Chronic Diseases: ${animal.chronicDiseases}
+          - Allergies: ${animal.allergies}
 
           Structure:
           {
@@ -35,7 +36,7 @@ export const generateDiet = async (req: Request, res: Response, next: NextFuncti
               "steps_to_do": ["Step 1", "Step 2", "..."],
               "calories": "String",
               "macro": { "protein": "String", "fat": "String", "fiber": "String" },
-              "micro": { "AdditionalNutrient": "String" }
+              "micro": { "AdditionalNutrient1": "String", "AdditionalNutrient2": "String", "..."  }
             },
             "afternoon": { /* Similar structure */ },
             "evening": { /* Similar structure */ }
@@ -73,7 +74,10 @@ export const generateDiet = async (req: Request, res: Response, next: NextFuncti
                   },
                   micro: {
                     type: "object",
-                    additionalProperties: { type: "string" } 
+                    additionalProperties: {
+                        type: "array",
+                        items: { type: "string" }
+                    } 
                   }
                 }
               },
