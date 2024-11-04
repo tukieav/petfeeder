@@ -1,11 +1,13 @@
-const ENV : any = process.env.NODE_ENV || 'development';
+import Constants from 'expo-constants';
 
-const CONFIG : any = {
+const ENV = Constants.manifest?.extra?.API_BASE_URL || 'development';
+
+const CONFIG: Record<string, { API_BASE_URL: string }> = {
   development: {
-    API_BASE_URL: 'http://192.168.1.96:3000',
+    API_BASE_URL: 'http://localhost:3000',
   },
   production: {
-    API_BASE_URL: 'https://api.yourproductionurl.com',
+    API_BASE_URL: ENV,
   },
 };
 

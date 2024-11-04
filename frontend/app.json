@@ -22,6 +22,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "API_BASE_URL": "https://api.yourproductionurl.com"
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

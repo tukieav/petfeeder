@@ -1,10 +1,8 @@
-import React from 'react';
-import { View, TextInput, Text, Button, StyleSheet } from 'react-native';
-import MaskInput from 'react-native-mask-input';
-import MultiSelect from 'react-native-multiple-select';
-import RNPickerSelect from 'react-native-picker-select';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Checkbox, Menu } from 'react-native-paper';
 
-interface AnimalFormProps {
+interface AnimalFormComponentProps {
   type: string;
   breed: string;
   name: string;
@@ -12,30 +10,21 @@ interface AnimalFormProps {
   diet: string;
   chronicDiseases: string[];
   allergies: string[];
-  setFormData: (data: Partial<AnimalFormProps>) => void;
+  setFormData: (data: Partial<AnimalFormComponentProps>) => void;
   handleSubmit: () => void;
   message: string;
-  error: {
-    type?: string;
-    breed?: string;
-    name?: string;
-    birthDate?: string;
-    diet?: string;
-    chronicDiseases?: string;
-    allergies?: string;
-    general?: string;
-  };
+  error: Record<string, string>;
   buttonText: string;
   animalOptions: {
     types: string[];
-    breeds: { [key: string]: string[] };
-    diets: { [key: string]: string[] };
-    chronicDiseases: { [key: string]: string[] };
-    allergies: { [key: string]: string[] };
+    breeds: string[];
+    diets: string[];
+    chronicDiseases: string[];
+    allergies: string[];
   };
 }
 
-export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
+const AnimalFormComponent: React.FC<AnimalFormComponentProps> = ({
   type,
   breed,
   name,
@@ -50,107 +39,112 @@ export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
   buttonText,
   animalOptions,
 }) => {
-  const handleInputChange = (field: keyof AnimalFormProps, value: any) => {
-    setFormData({ [field]: value });
-  };
+  const [showTypeMenu, setShowTypeMenu] = useState(false);
+  const [showBreedMenu, setShowBreedMenu] = useState(false);
+  const [showDietMenu, setShowDietMenu] = useState(false);
+  const [isDiseasesExpanded, setIsDiseasesExpanded] = useState(false);
+  const [isAllergiesExpanded, setIsAllergiesExpanded] = useState(false);
 
-  const filteredBreeds = animalOptions.breeds[type] || [];
-  const filteredDiets = animalOptions.diets[type] || [];
-  const filteredChronicDiseases = animalOptions.chronicDiseases[type] || [];
-  const filteredAllergies = animalOptions.allergies[type] || [];
+  const toggleItem = (list: string[], item: string, key: keyof AnimalFormComponentProps) => {
+    const updatedList = list.includes(item) ? list.filter(i => i !== item) : [...list, item];
+    setFormData({ [key]: updatedList });
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Type:</Text>
-      <RNPickerSelect
-        value={type}
-        onValueChange={(value) => handleInputChange('type', value)}
-        items={animalOptions.types.map((option) => ({ label: option, value: option }))}
-      />
-      {error?.type && <Text style={styles.errorText}>{error.type}</Text>}
+      <Menu
+        visible={showTypeMenu}
+        onDismiss={() => setShowTypeMenu(false)}
+        anchor={<TextInput label="Type" value={type} mode="outlined" onFocus={() => setShowTypeMenu(true)} style={styles.input} />}>
+        {animalOptions.types.map((option) => (
+          <Menu.Item key={option} onPress={() => { setFormData({ type: option }); setShowTypeMenu(false); }} title={option} />
+        ))}
+      </Menu>
 
-      <Text>Breed:</Text>
-      <RNPickerSelect
-        value={breed}
-        onValueChange={(value) => handleInputChange('breed', value)}
-        items={filteredBreeds.map((option) => ({ label: option, value: option }))}
-      />
-      {error?.breed && <Text style={styles.errorText}>{error.breed}</Text>}
+      <Menu
+        visible={showBreedMenu}
+        onDismiss={() => setShowBreedMenu(false)}
+        anchor={<TextInput label="Breed" value={breed} mode="outlined" onFocus={() => setShowBreedMenu(true)} style={styles.input} />}>
+        {animalOptions.breeds.map((option) => (
+          <Menu.Item key={option} onPress={() => { setFormData({ breed: option }); setShowBreedMenu(false); }} title={option} />
+        ))}
+      </Menu>
 
-      <Text>Name:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={(value) => handleInputChange('name', value)}
-      />
-      {error?.name && <Text style={styles.errorText}>{error.name}</Text>}
+      <TextInput label="Name" value={name} onChangeText={(value) => setFormData({ name: value })} mode="outlined" style={styles.input} error={!!error.name} />
 
-      <Text>Birth Date:</Text>
-      <MaskInput
-        style={styles.input}
-        placeholder="Birth Date (YYYY-MM-DD)"
-        value={birthDate}
-        onChangeText={(masked, unmasked) => handleInputChange('birthDate', unmasked)}
-        mask={[/\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
-      />
-      {error?.birthDate && <Text style={styles.errorText}>{error.birthDate}</Text>}
+      <TextInput label="Birth Date" value={birthDate} onChangeText={(value) => setFormData({ birthDate: value })} mode="outlined" style={styles.input} error={!!error.birthDate} placeholder="YYYY-MM-DD" />
 
-      <Text>Diet:</Text>
-      <RNPickerSelect
-        value={diet}
-        onValueChange={(value) => handleInputChange('diet', value)}
-        items={filteredDiets.map((option) => ({ label: option, value: option }))}
-      />
-      {error?.diet && <Text style={styles.errorText}>{error.diet}</Text>}
+      <Menu
+        visible={showDietMenu}
+        onDismiss={() => setShowDietMenu(false)}
+        anchor={<TextInput label="Diet" value={diet} mode="outlined" onFocus={() => setShowDietMenu(true)} style={styles.input} />}>
+        {animalOptions.diets.map((option) => (
+          <Menu.Item key={option} onPress={() => { setFormData({ diet: option }); setShowDietMenu(false); }} title={option} />
+        ))}
+      </Menu>
 
-      <Text>Chronic Diseases:</Text>
-      <MultiSelect
-        items={filteredChronicDiseases.map((option) => ({ id: option, name: option }))}
-        uniqueKey="id"
-        onSelectedItemsChange={(selectedItems) => handleInputChange('chronicDiseases', selectedItems)}
-        selectedItems={Array.isArray(chronicDiseases) ? chronicDiseases : []}
-        selectText="Select Diseases"
-        searchInputPlaceholderText="Search Diseases..."
-      />
-      {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
+      <TouchableOpacity onPress={() => setIsDiseasesExpanded(!isDiseasesExpanded)}>
+        <Text style={styles.sectionTitle}>
+          Chronic Diseases {isDiseasesExpanded ? '▼' : '►'}
+        </Text>
+      </TouchableOpacity>
+      {isDiseasesExpanded && animalOptions.chronicDiseases.map((disease) => (
+        <View key={disease} style={styles.checkboxContainer}>
+          <Checkbox status={chronicDiseases.includes(disease) ? 'checked' : 'unchecked'} onPress={() => toggleItem(chronicDiseases, disease, 'chronicDiseases')} />
+          <Text>{disease}</Text>
+        </View>
+      ))}
 
-      <Text>Allergies:</Text>
-      <MultiSelect
-        items={filteredAllergies.map((option) => ({ id: option, name: option }))}
-        uniqueKey="id"
-        onSelectedItemsChange={(selectedItems) => handleInputChange('allergies', selectedItems)}
-        selectedItems={Array.isArray(allergies) ? allergies : []}
-        selectText="Select Allergies"
-        searchInputPlaceholderText="Search Allergies..."
-      />
-      {error?.allergies && <Text style={styles.errorText}>{error.allergies}</Text>}
+      <TouchableOpacity onPress={() => setIsAllergiesExpanded(!isAllergiesExpanded)}>
+        <Text style={styles.sectionTitle}>
+          Allergies {isAllergiesExpanded ? '▼' : '►'}
+        </Text>
+      </TouchableOpacity>
+      {isAllergiesExpanded && animalOptions.allergies.map((allergy) => (
+        <View key={allergy} style={styles.checkboxContainer}>
+          <Checkbox status={allergies.includes(allergy) ? 'checked' : 'unchecked'} onPress={() => toggleItem(allergies, allergy, 'allergies')} />
+          <Text>{allergy}</Text>
+        </View>
+      ))}
 
-      <Button title={buttonText} onPress={handleSubmit} />
-      {message && <Text style={styles.successText}>{message}</Text>}
-      {error?.general && <Text style={styles.errorText}>{error.general}</Text>}
+      {message ? <Text style={styles.successMessage}>{message}</Text> : null}
+      {error.general ? <Text style={styles.errorMessage}>{error.general}</Text> : null}
+
+      <Button mode="contained" onPress={handleSubmit} style={styles.button}>{buttonText}</Button>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 16,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    marginBottom: 16,
   },
-  successText: {
+  sectionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  successMessage: {
     color: 'green',
-    marginTop: 10,
+    marginVertical: 8,
+    textAlign: 'center',
   },
-  errorText: {
+  errorMessage: {
     color: 'red',
-    marginTop: 10,
+    marginVertical: 8,
+    textAlign: 'center',
+  },
+  button: {
+    marginTop: 16,
   },
 });
+
+export default AnimalFormComponent;

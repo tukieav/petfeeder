@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { TextInput, Button, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { handleAuthRequest } from '../services/authService';
@@ -13,6 +14,7 @@ type RootStackParamList = {
 type AuthScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Auth'>;
 
 export default function Auth() {
+  const theme = useTheme(); // Pobieranie motywu Material Design
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
@@ -30,13 +32,42 @@ export default function Auth() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text style={styles.title}>{isRegistering ? 'Register' : 'Login'}</Text>
-      <TextInput style={styles.input} placeholder="Username" value={username} onChangeText={setUsername} />
-      <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
-      <Button title={isRegistering ? 'Register' : 'Login'} onPress={handleAuth} />
-      <Button title={isRegistering ? 'Already have an account? Login' : 'Don’t have an account? Register'} onPress={() => setIsRegistering(!isRegistering)} />
-      {errors.length > 0 && errors.map((error, index) => <Text key={index} style={styles.errorText}>{error}</Text>)}
+      <TextInput
+        label="Username"
+        value={username}
+        onChangeText={setUsername}
+        mode="outlined"
+        style={styles.input}
+        left={<TextInput.Icon icon="account" />}
+      />
+      <TextInput
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        mode="outlined"
+        secureTextEntry
+        style={styles.input}
+        left={<TextInput.Icon icon="lock" />}
+      />
+      <Button
+        mode="contained"
+        onPress={handleAuth}
+        style={styles.button}
+      >
+        {isRegistering ? 'Register' : 'Login'}
+      </Button>
+      <Button
+        mode="text"
+        onPress={() => setIsRegistering(!isRegistering)}
+        style={styles.switchButton}
+      >
+        {isRegistering ? 'Already have an account? Login' : 'Don’t have an account? Register'}
+      </Button>
+      {errors.length > 0 && errors.map((error, index) => (
+        <Text key={index} style={styles.errorText}>{error}</Text>
+      ))}
     </View>
   );
 }
@@ -45,21 +76,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
-    marginBottom: 16,
+    fontSize: 28,
+    marginBottom: 24,
     textAlign: 'center',
+    fontWeight: 'bold',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  button: {
+    marginTop: 20,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  switchButton: {
+    marginTop: 12,
   },
   errorText: {
     color: 'red',
     marginTop: 10,
+    textAlign: 'center',
   },
 });
