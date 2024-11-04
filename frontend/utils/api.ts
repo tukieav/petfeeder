@@ -8,7 +8,13 @@ const getToken = async (): Promise<string> => {
   return token;
 };
 
-const apiRequest = async (method: 'get' | 'post' | 'put' | 'delete', url: string, data?: any, requireToken: boolean = true, headers: any = {}) => {
+const apiRequest = async (
+  method: 'get' | 'post' | 'put' | 'delete',
+  url: string,
+  data?: any,
+  requireToken: boolean = true,
+  headers: any = {}
+) => {
   let token = null;
   if (requireToken) {
     token = await getToken();
@@ -26,7 +32,11 @@ const apiRequest = async (method: 'get' | 'post' | 'put' | 'delete', url: string
   });
 };
 
-export const apiGet = (url: string, requireToken: boolean = true) => apiRequest('get', url, undefined, requireToken);
-export const apiPost = (url: string, data: any, requireToken: boolean = true, headers: any = {}) => apiRequest('post', url, data, requireToken, headers);
-export const apiPut = (url: string, data: any, requireToken: boolean = true, headers: any = {}) => apiRequest('put', url, data, requireToken, headers);
-export const apiDelete = (url: string, requireToken: boolean = true, headers: any = {}) => apiRequest('delete', url, undefined, requireToken, headers);
+export const apiGet = (url: string, requireToken: boolean = true) =>
+  apiRequest('get', url, undefined, requireToken);
+export const apiPost = (url: string, data?: any, requireToken: boolean = true, headers: any = {}) =>
+  apiRequest('post', url, data, requireToken, headers);
+export const apiPut = (url: string, data?: any, requireToken: boolean = true, headers: any = {}) =>
+  apiRequest('put', url, data, requireToken, headers);
+export const apiDelete = (url: string, requireToken: boolean = true, headers: any = {}) =>
+  apiRequest('delete', url, undefined, requireToken, headers);

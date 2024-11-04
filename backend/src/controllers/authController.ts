@@ -36,7 +36,6 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign({ userId: user._id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Logowanie tokenu JWT
     console.log('JWT Token generated:', token);
 
     res.json({ token });
@@ -48,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
  
 export const logout = async (req: Request, res: Response) => {
   try {
-    console.log('Logout request received'); // Logowanie dla debugowania
+    console.log('Logout request received');
     res.status(200).json({ message: 'Logout successful' });
   } catch (error: any) {
     console.error('Logout failed:', error);
