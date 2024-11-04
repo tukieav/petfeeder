@@ -6,8 +6,9 @@ const animalSchema = new mongoose.Schema({
   breed: { type: String, required: true },
   name: { type: String, required: true },
   birthDate: { type: String, required: true },
-  diet: { type: String, required: true },
-  chronicDiseases: { type: String, required: true }
+  diet: { type: String, required: false }, 
+  chronicDiseases: { type: [String], required: false },
+  allergies: { type: [String], required: false }
 });
 
 export default mongoose.model('Animal', animalSchema);

@@ -1,4 +1,4 @@
-export const validateAnimalForm = (type: string, breed: string, name: string, birthDate: string, diet: string, chronicDiseases: string) => {
+export const validateAnimalForm = (type: string, breed: string, name: string, birthDate: string, diet: string, chronicDiseases: any, allergies: any) => {
     const errors: any = {};
     
     if (!type) errors.type = 'Type is required';
@@ -10,7 +10,8 @@ export const validateAnimalForm = (type: string, breed: string, name: string, bi
       errors.birthDate = 'Birth Date must be in YYYY-MM-DD format';
     }
     if (!diet) errors.diet = 'Diet is required';
-    if (!chronicDiseases) errors.chronicDiseases = 'Chronic Diseases is required';
-    
+    if (!Array.isArray(chronicDiseases)) errors.chronicDiseases = 'Chronic Diseases must be an array';
+    if (!Array.isArray(allergies)) errors.allergies = 'Allergies must be an array';
+
     return errors;
   };

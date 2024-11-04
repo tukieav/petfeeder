@@ -10,7 +10,8 @@ interface Animal {
   name: string;
   birthDate: string;
   diet: string;
-  chronicDiseases: string;
+  chronicDiseases: string[];
+  allergies: string[];
 }
 
 interface ApiResponse<T> {
@@ -34,9 +35,7 @@ export const getAnimalDetails = async (animalId: string): Promise<Animal> => {
       const formattedBirthDate = format(new Date(data.birthDate || ''), 'yyyy-MM-dd');
       const url = animalId ? `/animals/${animalId}` : '/animals';
       const method = animalId ? apiPut : apiPost;
-      const response = await method(url, { ...data, birthDate: formattedBirthDate }, true, { 'X-CSRF-Token': csrfToken });
-      console.log('Saving animal data:', data);
-      return { success: true, message: animalId ? 'Animal updated successfully' : 'Animal added successfully' };
+      const response = await method(url, { ...data, birthDate: formattedBirthDate, chronicDiseases: data.chronicDiseases ?? [], allergies: data.allergies ?? [] }, true, { 'X-CSRF-Token': csrfToken });      return { success: true, message: animalId ? 'Animal updated successfully' : 'Animal added successfully' };
     } catch (error: any) {
       throw new Error(`Error saving animal: ${error.message}`);
     }

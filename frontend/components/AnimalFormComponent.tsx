@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, TextInput, Text, Button, StyleSheet } from 'react-native';
-import  MaskInput, { Masks } from 'react-native-mask-input';
-
+import MaskInput from 'react-native-mask-input';
+import MultiSelect from 'react-native-multiple-select';
+import RNPickerSelect from 'react-native-picker-select';
 
 interface AnimalFormProps {
   type: string;
@@ -9,78 +10,137 @@ interface AnimalFormProps {
   name: string;
   birthDate: string;
   diet: string;
-  chronicDiseases: string;
+  chronicDiseases: string[];
+  allergies: string[];
   setFormData: (data: Partial<AnimalFormProps>) => void;
   handleSubmit: () => void;
   message: string;
-  error: any;
+  error: {
+    type?: string;
+    breed?: string;
+    name?: string;
+    birthDate?: string;
+    diet?: string;
+    chronicDiseases?: string;
+    allergies?: string;
+    general?: string;
+  };
   buttonText: string;
+  animalOptions: {
+    types: string[];
+    breeds: { [key: string]: string[] };
+    diets: { [key: string]: string[] };
+    chronicDiseases: { [key: string]: string[] };
+    allergies: { [key: string]: string[] };
+  };
 }
 
 export const AnimalFormComponent: React.FC<AnimalFormProps> = ({
-    type, breed, name, birthDate, diet, chronicDiseases, setFormData, handleSubmit, message, error, buttonText
-  }) => {
-    const handleInputChange = (field: keyof AnimalFormProps, value: string) => {
-      setFormData({ [field]: value });
-    };
-
-    return (
-      <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type"
-          value={type}
-          onChangeText={(value) => handleInputChange('type', value)}
-        />
-        {typeof error?.type === 'string' && <Text style={styles.errorText}>{error.type}</Text>}
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Breed"
-          value={breed}
-          onChangeText={(value) => handleInputChange('breed', value)}
-        />
-        {typeof error?.breed === 'string' && <Text style={styles.errorText}>{error.breed}</Text>}
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={name}
-          onChangeText={(value) => handleInputChange('name', value)}
-        />
-        {typeof error?.name === 'string' && <Text style={styles.errorText}>{error.name}</Text>}
-        
-        <MaskInput
-            style={styles.input}
-            placeholder="Birth Date (YYYY-MM-DD)"
-            value={birthDate}
-            onChangeText={(mask) => handleInputChange('birthDate', mask)}
-            mask={[/\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
-          />
-          {typeof error?.birthDate === 'string' && <Text style={styles.errorText}>{error.birthDate}</Text>}
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Diet"
-          value={diet}
-          onChangeText={(value) => handleInputChange('diet', value)}
-        />
-        {typeof error?.diet === 'string' && <Text style={styles.errorText}>{error.diet}</Text>}
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Chronic Diseases"
-          value={chronicDiseases}
-          onChangeText={(value) => handleInputChange('chronicDiseases', value)}
-        />
-        {typeof error?.chronicDiseases === 'string' && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
-        
-        <Button title={buttonText} onPress={handleSubmit} />
-        {typeof message === 'string' && <Text style={styles.successText}>{message}</Text>}
-        {typeof error?.general === 'string' && <Text style={styles.errorText}>{error.general}</Text>}
-      </View>
-    );
+  type,
+  breed,
+  name,
+  birthDate,
+  diet,
+  chronicDiseases,
+  allergies,
+  setFormData,
+  handleSubmit,
+  message,
+  error,
+  buttonText,
+  animalOptions,
+}) => {
+  const handleInputChange = (field: keyof AnimalFormProps, value: any) => {
+    setFormData({ [field]: value });
   };
+
+  const filteredBreeds = animalOptions.breeds[type] || [];
+  const filteredDiets = animalOptions.diets[type] || [];
+  const filteredChronicDiseases = animalOptions.chronicDiseases[type] || [];
+  const filteredAllergies = animalOptions.allergies[type] || [];
+
+  return (
+    <View style={styles.container}>
+      <Text>Type:</Text>
+      <RNPickerSelect
+        value={type}
+        onValueChange={(value) => handleInputChange('type', value)}
+        items={animalOptions.types.map((option) => ({ label: option, value: option }))}
+      />
+      {error?.type && <Text style={styles.errorText}>{error.type}</Text>}
+
+      <Text>Breed:</Text>
+      <RNPickerSelect
+        value={breed}
+        onValueChange={(value) => handleInputChange('breed', value)}
+        items={filteredBreeds.map((option) => ({ label: option, value: option }))}
+      />
+      {error?.breed && <Text style={styles.errorText}>{error.breed}</Text>}
+
+      <Text>Name:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={(value) => handleInputChange('name', value)}
+      />
+      {error?.name && <Text style={styles.errorText}>{error.name}</Text>}
+
+      <Text>Birth Date:</Text>
+      <MaskInput
+        style={styles.input}
+        placeholder="Birth Date (YYYY-MM-DD)"
+        value={birthDate}
+        onChangeText={(masked, unmasked) => handleInputChange('birthDate', unmasked)}
+        mask={[/\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/]}
+      />
+      {error?.birthDate && <Text style={styles.errorText}>{error.birthDate}</Text>}
+
+      <Text>Diet:</Text>
+      <RNPickerSelect
+        value={diet}
+        onValueChange={(value) => handleInputChange('diet', value)}
+        items={filteredDiets.map((option) => ({ label: option, value: option }))}
+      />
+      {error?.diet && <Text style={styles.errorText}>{error.diet}</Text>}
+
+      <RNPickerSelect
+        value={chronicDiseases}
+        onValueChange={(value) => handleInputChange('chronicDiseases', value)}
+        items={filteredChronicDiseases.map((option) => ({ label: option, value: option }))}
+      />
+      {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
+      
+      <Text>Chronic Diseases:</Text>
+      <MultiSelect
+        items={filteredChronicDiseases.map((option) => ({ id: option, name: option }))}
+        uniqueKey="id"
+        onSelectedItemsChange={(selectedItems) => handleInputChange('chronicDiseases', selectedItems)}
+        selectedItems={chronicDiseases}
+        selectText="Select Diseases"
+        searchInputPlaceholderText="Search Diseases..."
+      />
+      {error?.chronicDiseases && <Text style={styles.errorText}>{error.chronicDiseases}</Text>}
+
+
+
+      <Text>Allergies:</Text>
+      <MultiSelect
+        items={filteredAllergies.map((option) => ({ id: option, name: option }))}
+        uniqueKey="id"
+        onSelectedItemsChange={(selectedItems) => handleInputChange('allergies', selectedItems)}
+        selectedItems={allergies}
+        selectText="Select Allergies"
+        searchInputPlaceholderText="Search Allergies..."
+      />
+      {error?.allergies && <Text style={styles.errorText}>{error.allergies}</Text>}
+
+      <Button title={buttonText} onPress={handleSubmit} />
+      {message && <Text style={styles.successText}>{message}</Text>}
+      {error?.general && <Text style={styles.errorText}>{error.general}</Text>}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

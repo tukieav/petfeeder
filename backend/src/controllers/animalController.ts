@@ -50,16 +50,15 @@ export const getAnimalById = async (req: Request, res: Response, next: NextFunct
 
 export const updateAnimal = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  const { type, breed, name, birthDate, diet, chronicDiseases } = req.body;
+  const { type, breed, name, birthDate, diet, chronicDiseases, allergies } = req.body;
 
   try {
     const animal = await Animal.findById(id);
     if (!animal || animal.userId.toString() !== req.user?.userId) {
       return res.status(404).json({ message: 'Animal not found or unauthorized' });
     }
-    Object.assign(animal, { type, breed, name, birthDate, diet, chronicDiseases });
-    await animal.save();
-
+    Object.assign(animal, { type, breed, name, birthDate, diet, chronicDiseases: chronicDiseases ?? [], allergies: allergies ?? [] });
+        await animal.save();
     res.status(200).json(animal);
   } catch (error) {
     next(error);
